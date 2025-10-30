@@ -100,10 +100,19 @@ Then use `mcp__beads__*` functions instead of CLI commands.
 
 For more details, see README.md and QUICKSTART.md.
 
+## Tooling & Quality Commands
+- Install required tooling with `go install mvdan.cc/gofumpt@v0.9.2` and `go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8`; ensure `$(go env GOBIN)` is on `PATH`.
+- Format code:  
+  `find . -name '*.go' -not -path './vendor/*' -not -path './.git/*' -print0 | xargs -0 gofumpt -w`
+- Check formatting (no writes):  
+  `find . -name '*.go' -not -path './vendor/*' -not -path './.git/*' -print0 | xargs -0 gofumpt -l`
+- Lint: `golangci-lint run`
+- Build: `go build -o ./bin/notionctl .`
+
 ## Testing Guidelines
-- Jest (configured via `ts-jest`) backs unit tests; co-locate files as `<module>.test.ts`.
-- Mock filesystem, AWS, and Salesforce boundaries to keep tests deterministic.
-- No formal coverage threshold yet, but strive to cover business logic paths in `src/search` and `src/tools`.
+- Run `go test ./...` before submitting changes; add focused packages when iterating locally.
+- Prefer deterministic tests by mocking external services (Notion API, filesystem edges, etc.).
+- Document notable coverage gaps or newly added scenarios in PR descriptions.
 
 ## Commit & Pull Request Guidelines
 - Commit subjects follow `scope: concise summary (#issue)`; include regenerated artifacts (`docs/flows/**`, `dist/`, index outputs) with the source change.

@@ -12,8 +12,11 @@ The implementation targets Go 1.22 and emphasises reproducible workflows and str
    ```sh
    git clone https://github.com/yourorg/notionctl.git
    cd notionctl
-   make tools
+   go install mvdan.cc/gofumpt@v0.9.2
+   go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
    ```
+
+   Both commands place binaries in `$(go env GOBIN)` (or `$(go env GOPATH)/bin`); ensure that directory is on your `PATH`.
 
 3. Export your Notion integration token (or use the `auth login` command described below).
 
@@ -134,11 +137,20 @@ The watcher acknowledges Notion deliveries, verifies the shared secret when prov
 
 ## Tooling & Quality Gates
 
-- Formatting is enforced by [`gofumpt`](https://github.com/mvdan/gofumpt); run `make fmt` to rewrite files and `make fmt-check` to verify formatting.
-- Static analysis is handled by [`golangci-lint`](https://github.com/golangci/golangci-lint) with a strict ruleset (`.golangci.yml`). Run `make lint` to execute the full suite.
-- `make ci-lint` runs both format checks and linting.
+- Formatting is enforced by [`gofumpt`](https://github.com/mvdan/gofumpt). From the repository root, run:
 
-All targets live in the project `Makefile`.
+  ```sh
+  find . -name '*.go' -not -path './vendor/*' -not -path './.git/*' -print0 | xargs -0 gofumpt -w
+  ```
+
+  To verify formatting without modifying files:
+
+  ```sh
+  find . -name '*.go' -not -path './vendor/*' -not -path './.git/*' -print0 | xargs -0 gofumpt -l
+  ```
+
+- Static analysis is handled by [`golangci-lint`](https://github.com/golangci/golangci-lint) with a strict ruleset (`.golangci.yml`). Run `golangci-lint run`.
+- Continuous integration performs the equivalent of the two commands above before running tests.
 
 ## Testing
 
@@ -167,7 +179,7 @@ Each profile creates a separate token entry in the keyring and a dedicated Notio
 
 ## Contributing
 
-1. Run `go test ./...` and `make lint` before submitting changes.
+1. Run `go test ./...` and `golangci-lint run` before submitting changes (format with `gofumpt` as described above).
 2. Keep README usage examples current when new commands or flags are added.
 3. Update or extend the test suite alongside functional changes.
 
