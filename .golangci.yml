@@ -1,0 +1,106 @@
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+  go: "1.22"
+
+linters-settings:
+  cyclop:
+    max-complexity: 10
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  funlen:
+    lines: 80
+    statements: 60
+  gocognit:
+    min-complexity: 10
+  gocyclo:
+    min-complexity: 10
+  gosec:
+    excludes:
+      - G505 # Allow crypto/rand seeding; revisit when code exists
+    exclude-generated: true
+  govet:
+    enable:
+      - fieldalignment
+      - nilness
+      - shadow
+  mnd:
+    settings:
+      mnd:
+        ignored-numbers:
+          - '0'
+          - '1'
+        ignored-functions:
+          - math.Pow
+        ignored-files:
+          - _test.go
+  misspell:
+    locale: US
+  revive:
+    confidence: 0.8
+    rules:
+      - name: exported
+        severity: warning
+      - name: blank-imports
+      - name: indent-error-flow
+      - name: unexported-return
+      - name: early-return
+      - name: line-length-limit
+        arguments: [120]
+
+linters:
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - containedctx
+    - copyloopvar
+    - cyclop
+    - decorder
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - forbidigo
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofumpt
+    - goimports
+    - mnd
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - prealloc
+    - revive
+    - staticcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - whitespace
+    - wrapcheck
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: true
+  exclude-dirs:
+    - tools
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - cyclop
+        - funlen
+        - gocognit
+        - gocyclo
+        - gomnd
+        - wrapcheck
