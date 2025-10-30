@@ -108,6 +108,7 @@ For more details, see README.md and QUICKSTART.md.
 ## Commit & Pull Request Guidelines
 - Commit subjects follow `scope: concise summary (#issue)`; include regenerated artifacts (`docs/flows/**`, `dist/`, index outputs) with the source change.
 - Pull requests must use the template’s `### 📝 Description` section, list validation steps (tests, doc rebuilds, deploys), link tickets, and attach screenshots or diffs for doc updates when relevant.
+- Commit `.beads/issues.jsonl` immediately after any bd issue change (create/update/close), push to GitHub without delay, and resolve merge conflicts on that file before proceeding with other work.
 
 ## Agent Behaviors
 - Delete unused or obsolete files when your changes make them irrelevant (refactors, feature removals, etc.), and revert files only when the change is yours or explicitly requested. If a git operation leaves you unsure about other agents' in-flight work, stop and coordinate instead of deleting.
