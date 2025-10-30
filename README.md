@@ -15,13 +15,38 @@ The implementation targets Go 1.22 and emphasises reproducible workflows and str
    make tools
    ```
 
-3. Build the CLI (optional if you run through `go run`):
+3. Export your Notion integration token (or use the `auth login` command described below).
 
-   ```sh
-   go build ./...
-   ```
+## Build & Install
 
-4. Export your Notion integration token (or use the `auth login` command described below).
+- **Local build** – compile the binary into `./bin` for immediate use:
+
+  ```sh
+  mkdir -p bin
+  go build -o ./bin/notionctl .
+  ```
+
+  The resulting `bin/notionctl` can be run in-place (`./bin/notionctl ds list ...`) or copied into a directory on your `PATH`.
+
+- **Install into your Go toolchain** – make the CLI available globally on the current machine:
+
+  ```sh
+  go install github.com/yourorg/notionctl@latest
+  ```
+
+  This places the binary in `$(go env GOBIN)` (or `$(go env GOPATH)/bin`), so ensure that directory is on your `PATH`.
+
+- **Use elsewhere** – distribute the CLI to another environment without Go tooling:
+
+  1. Build for the target platform using Go’s cross-compilation support, for example:
+
+     ```sh
+     GOOS=linux GOARCH=amd64 go build -o notionctl-linux-amd64 .
+     ```
+
+  2. Transfer the compiled binary (e.g. via `scp`, `rsync`, or attaching it to a release).
+  3. Mark it executable (`chmod +x notionctl-linux-amd64`) and place it in a directory on the target machine’s `PATH` (for instance `/usr/local/bin/notionctl`).
+  4. Run `notionctl version` to confirm the installation.
 
 ## Authentication
 
