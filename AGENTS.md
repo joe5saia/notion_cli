@@ -18,10 +18,6 @@
 bd ready --json
 ```
 
-**Plan validation before work:**
-- Think through the tests, commands, or manual checks that will validate success.
-- Record those validation steps directly in the bd issue when you create or update it.
-
 **Create new issues:**
 ```bash
 bd create "Issue title" -t bug|feature|task -p 0-4 --json
@@ -73,26 +69,6 @@ bd automatically syncs with git:
 - Imports from JSONL when newer (e.g., after `git pull`)
 - No manual export/import needed!
 
-### MCP Server (Recommended)
-
-If using Claude or MCP-compatible clients, install the beads MCP server:
-
-```bash
-pip install beads-mcp
-```
-
-Add to MCP config (e.g., `~/.config/claude/config.json`):
-```json
-{
-  "beads": {
-    "command": "beads-mcp",
-    "args": []
-  }
-}
-```
-
-Then use `mcp__beads__*` functions instead of CLI commands.
-
 ### Important Rules
 
 - ✅ Use bd for ALL task tracking
@@ -104,7 +80,7 @@ Then use `mcp__beads__*` functions instead of CLI commands.
 - ❌ Do NOT use external issue trackers
 - ❌ Do NOT duplicate tracking systems
 
-For more details, see README.md and QUICKSTART.md.
+For more details, see README.md and BEADS_QUICKSTART.md.
 
 ## Tooling & Quality Commands
 - Install required tooling with `go install mvdan.cc/gofumpt@v0.9.2` and `go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8`; ensure `$(go env GOBIN)` is on `PATH`.
@@ -120,11 +96,12 @@ For more details, see README.md and QUICKSTART.md.
 - Prefer deterministic tests by mocking external services (Notion API, filesystem edges, etc.).
 - Document notable coverage gaps or newly added scenarios in PR descriptions.
 
-## Commit & Pull Request Guidelines
+## Commit Guidelines
+- All agents can commit and push changes directly to main branch; no PRs needed.
 - Commit subjects follow `scope: concise summary (#issue)`; include regenerated artifacts (`docs/flows/**`, `dist/`, index outputs) with the source change.
-- Pull requests must use the template’s `### 📝 Description` section, list validation steps (tests, doc rebuilds, deploys), link tickets, and attach screenshots or diffs for doc updates when relevant.
 - Commit `.beads/issues.jsonl` immediately after any bd issue change (create/update/close), push to GitHub without delay, and resolve merge conflicts on that file before proceeding with other work.
-- After completing the task, commit the code and issue updates, then push the branch to GitHub using `gh`.
+- After completing the task, commit the code and issue updates, then push to Github.
+- Do not ask for permissions to commit or push changes; all agents have write access.
 
 ## Agent Behaviors
 - Delete unused or obsolete files when your changes make them irrelevant (refactors, feature removals, etc.), and revert files only when the change is yours or explicitly requested. If a git operation leaves you unsure about other agents' in-flight work, stop and coordinate instead of deleting.
