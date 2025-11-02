@@ -18,7 +18,7 @@ The implementation targets Go 1.22 and emphasises reproducible workflows and str
 
    Both commands place binaries in `$(go env GOBIN)` (or `$(go env GOPATH)/bin`); ensure that directory is on your `PATH`.
 
-3. Export your Notion integration token (or use the `auth login` command described below).
+3. Provision a Notion integration, share it with the databases or pages you want to manage, and store its token with `notionctl` (see **Authentication Setup** below).
 
 ## Build & Install
 
@@ -51,19 +51,61 @@ The implementation targets Go 1.22 and emphasises reproducible workflows and str
   3. Mark it executable (`chmod +x notionctl-linux-amd64`) and place it in a directory on the target machine’s `PATH` (for instance `/usr/local/bin/notionctl`).
   4. Run `notionctl version` to confirm the installation.
 
-## Authentication
+## Authentication Setup
 
-`notionctl` stores tokens in the OS keyring and persists auxiliary configuration under `~/.config/notionctl`.
+Before running commands you must create a Notion internal integration, grant it access to the content you want to inspect, and let `notionctl` store the token securely.
+
+### Create and authorize an integration
+
+1. Visit [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations) and create a **New integration** (choose *Internal Integration*).  
+2. Copy the generated **Internal Integration Token** — it starts with `secret_`.  
+3. In Notion, open each database or page you want `notionctl` to reach, click **• • • → Add connections**, and select the integration; Notion must show it as *Connected* before API calls will succeed.
+
+### Store the token with `notionctl`
+
+`notionctl` writes tokens into your OS keyring and keeps profile metadata under `~/.config/notionctl`.
 
 ```sh
-# Provide an existing integration token interactively (password prompt is hidden)
+# Prompt for the token (hidden input)
+notionctl auth login
+
+# Supply the token inline or via stdin in non-interactive environments
 notionctl auth login --token "secret_xxx"
 
-# Use a different profile (defaults to "default")
+# Maintain separate credentials (e.g. work vs personal spaces)
 notionctl auth login --profile personal --token "secret_xxx"
 ```
 
-Tokens are retrieved implicitly by every command via the selected profile (`--profile` flag).
+- Omit `--token` to be prompted; you can also pipe a token: `printf 'secret_xxx\n' | notionctl auth login --profile ci`.
+- Override Notion’s API version if you need to experiment with preview features by adding `--notion-version 2025-09-03`.
+- All runtime commands implicitly read from the active profile; pass `--profile` whenever you want to switch.
+
+To rotate credentials, rerun `notionctl auth login` with the new token. The existing keyring entry is replaced in place.
+
+## Finding Notion IDs
+
+Many commands require stable Notion identifiers. The API expects 32-character IDs without dashes; Notion URLs include the same ID with dashes for readability.
+
+### Database IDs
+
+1. Open the database as a full page in Notion.  
+2. Copy the URL — it ends with a 32-character UUID (e.g. `abcd1234-ef56-7890-ab12-34567890cdef`).  
+3. Remove the dashes to get the API form: `abcd1234ef567890ab1234567890cdef`.  
+4. Verify access by listing data sources:
+
+```sh
+notionctl ds list --database-id abcd1234ef567890ab1234567890cdef --format table
+```
+
+### Data source IDs
+
+`notionctl ds list` returns an `ID` column for each data source exposed by the database. Pass one of those values to commands such as `notionctl ds query` or `notionctl changes`. Use `--format json` if you want to capture the identifier programmatically.
+
+### Page and block IDs
+
+- Copy a page link with **Share → Copy link**, then strip the dashes just like the database ID.  
+- For child blocks, append `/block/<block-id>` in the URL — the trailing segment is the block ID.  
+- Commands such as `notionctl pages get` and `notionctl blocks append` accept these dashless IDs.
 
 ## Commands
 
