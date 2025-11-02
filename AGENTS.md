@@ -18,6 +18,10 @@
 bd ready --json
 ```
 
+**Plan validation before work:**
+- Think through the tests, commands, or manual checks that will validate success.
+- Record those validation steps directly in the bd issue when you create or update it.
+
 **Create new issues:**
 ```bash
 bd create "Issue title" -t bug|feature|task -p 0-4 --json
@@ -54,12 +58,13 @@ bd close bd-42 --reason "Completed" --json
 ### Workflow for AI Agents
 
 1. **Check ready work**: `bd ready` shows unblocked issues
-2. **Claim your task**: `bd update <id> --status in_progress`
-3. **Work on it**: Implement, test, document
-4. **Discover new work?** Create linked issue:
+2. **Create first, then execute**: Every task must exist in bd before any implementation begins; include the validation steps you will run in the issue details.
+3. **Claim your task**: `bd update <id> --status in_progress`
+4. **Work on it**: Implement, test, document following the recorded validation plan.
+5. **Discover new work?** Create linked issue:
    - `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
-5. **Complete**: `bd close <id> --reason "Done"`
-6. **Commit together**: Always commit the `.beads/issues.jsonl` file together with the code changes so issue state stays in sync with code state
+6. **Complete**: `bd close <id> --reason "Done"`
+7. **Commit together**: Always commit the `.beads/issues.jsonl` file together with the code changes so issue state stays in sync with code state
 
 ### Auto-Sync
 
@@ -93,6 +98,7 @@ Then use `mcp__beads__*` functions instead of CLI commands.
 - ✅ Use bd for ALL task tracking
 - ✅ Always use `--json` flag for programmatic use
 - ✅ Link discovered work with `discovered-from` dependencies
+- ✅ Document the validation steps inside each bd issue before starting work
 - ✅ Check `bd ready` before asking "what should I work on?"
 - ❌ Do NOT create markdown TODO lists
 - ❌ Do NOT use external issue trackers
@@ -118,6 +124,7 @@ For more details, see README.md and QUICKSTART.md.
 - Commit subjects follow `scope: concise summary (#issue)`; include regenerated artifacts (`docs/flows/**`, `dist/`, index outputs) with the source change.
 - Pull requests must use the template’s `### 📝 Description` section, list validation steps (tests, doc rebuilds, deploys), link tickets, and attach screenshots or diffs for doc updates when relevant.
 - Commit `.beads/issues.jsonl` immediately after any bd issue change (create/update/close), push to GitHub without delay, and resolve merge conflicts on that file before proceeding with other work.
+- After completing the task, commit the code and issue updates, then push the branch to GitHub using `gh`.
 
 ## Agent Behaviors
 - Delete unused or obsolete files when your changes make them irrelevant (refactors, feature removals, etc.), and revert files only when the change is yours or explicitly requested. If a git operation leaves you unsure about other agents' in-flight work, stop and coordinate instead of deleting.
